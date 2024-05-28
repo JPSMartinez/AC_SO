@@ -1,0 +1,35 @@
+#!/bin/bash
+
+menu() {
+	clear
+	dia=$(date +%d)
+	mes=$(date +%B)
+	ano=$(date +%Y)
+
+	formatacao_data=$(printf "%-59s" "# Rio de Janeiro, $dia de $mes de $ano")
+
+	echo "############################################################"
+	echo "# IBMEC                                                    #"
+ 	echo "# Sistemas Operacionais                 Semestre 1 de 2024 #"
+    	echo "# Código IBM8940                        Turma 8001         #"
+    	echo "# Professor: Luiz Fernando T. Farias                       #"
+   	echo "#----------------------------------------------------------#"
+   	echo "# Equipe Desenvolvedora:                                   #"
+    	echo "#   Aluno: João Pedro Martinez                             #"
+    	echo "#   Aluno: Phillipe Secondo                                #"
+    	echo "#----------------------------------------------------------#"
+	echo "${formatacao_data}#"
+	echo "# Hora do Sistema: $(date +%H) horas e $(date +%M) minutos                   #"
+	echo "############################################################"
+	echo ""
+	echo "Menu de Escolhas:"
+	echo "  1) Escolha 1"
+	echo "  2) Escolha 2"
+	echo "  3) Escolha 3"
+	echo "  4) Escolha 4"
+	echo "  5) Finalizar Programa"
+	echo ""
+	echo "Selecione uma opção:"
+}
+
+menu
