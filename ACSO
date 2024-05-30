@@ -1,35 +1,72 @@
-#!/bin/bash
-
 menu() {
-	clear
-	dia=$(date +%d)
-	mes=$(date +%B)
-	ano=$(date +%Y)
+    clear
+    dia=$(date +%d)
+    mes=$(date +%B)
+    ano=$(date +%Y)
 
-	formatacao_data=$(printf "%-59s" "# Rio de Janeiro, $dia de $mes de $ano")
+    formatacao_data=$(printf "%-59s" "# Rio de Janeiro, $dia de $mes de $ano")
 
-	echo "############################################################"
-	echo "# IBMEC                                                    #"
- 	echo "# Sistemas Operacionais                 Semestre 1 de 2024 #"
-    	echo "# Código IBM8940                        Turma 8001         #"
-    	echo "# Professor: Luiz Fernando T. Farias                       #"
-   	echo "#----------------------------------------------------------#"
-   	echo "# Equipe Desenvolvedora:                                   #"
-    	echo "#   Aluno: João Pedro Martinez                             #"
-    	echo "#   Aluno: Phillipe Secondo                                #"
-    	echo "#----------------------------------------------------------#"
-	echo "${formatacao_data}#"
-	echo "# Hora do Sistema: $(date +%H) horas e $(date +%M) minutos                   #"
-	echo "############################################################"
-	echo ""
-	echo "Menu de Escolhas:"
-	echo "  1) Escolha 1"
-	echo "  2) Escolha 2"
-	echo "  3) Escolha 3"
-	echo "  4) Escolha 4"
-	echo "  5) Finalizar Programa"
-	echo ""
-	echo "Selecione uma opção:"
+    echo "############################################################"
+    echo "# IBMEC                                                    #"
+    echo "# Sistemas Operacionais                 Semestre 1 de 2024 #"
+    echo "# Código IBM8940                        Turma 8001         #"
+    echo "# Professor: Luiz Fernando T. Farias                       #"
+    echo "#----------------------------------------------------------#"
+    echo "# Equipe Desenvolvedora:                                   #"
+    echo "#   Aluno: João Pedro Martinez                             #"
+    echo "#   Aluno: Phillipe Secondo                                #"
+    echo "#----------------------------------------------------------#"
+    echo "${formatacao_data}#"
+    echo "# Hora do Sistema: $(date +%H) horas e $(date +%M) minutos                   #"
+    echo "############################################################"
+    echo ""
+    echo "Menu de Escolhas:"
+    echo "  1) Escolha 1"
+    echo "  2) Escolha 2"
+    echo "  3) Escolha 3"
+    echo "  4) Realizar Função Especial (Montar Partição)"
+    echo "  5) Finalizar Programa"
+    echo ""
+    echo "Selecione uma opção:"
 }
 
+realizar_funcao_especial() {
+    echo "Digite o dispositivo/partição que deseja montar (ex: /dev/sdXY):"
+    read dispositivo
+    echo "Digite o diretório de montagem desejado:"
+    read diretorio
+    montar_particao "$dispositivo" "$diretorio"
+}
+
+processar_opcao() {
+    read opcao
+    case $opcao in
+        1) echo "Você selecionou a opção 1." ;;
+        2) echo "Você selecionou a opção 2." ;;
+        3) echo "Você selecionou a opção 3." ;;
+        4) realizar_funcao_especial ;;
+        5) echo "Programa finalizado." ;;
+        *) echo "Opção inválida. Por favor, escolha novamente." ;;
+    esac
+}
+
+montar_particao() {
+    # Verifica se o diretório de montagem já existe
+    if [ -d "$2" ]; then
+        # Monta a partição
+        sudo mount -t ntfs "$1" "$2"
+
+        # Verifica se a montagem foi bem-sucedida
+        if [ $? -eq 0 ]; then
+            echo "Partição montada com sucesso em $2."
+        else
+            echo "Erro ao montar a partição."
+        fi
+    else
+        echo "O diretório de montagem não existe."
+    fi
+}
+
+
 menu
+processar_opcao
