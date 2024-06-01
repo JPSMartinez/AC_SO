@@ -30,11 +30,13 @@ menu() {
     echo "Selecione uma opção:"
 }
 
-realizar_funcao_especial() {
+func_montar_particao() {
     echo "Digite o dispositivo/partição que deseja montar (ex: /dev/sdb1):"
     read dispositivo
     echo "Digite o diretório de montagem desejado:"
     read diretorio
+    echo "Digite o Sistema de Arquivo que deseja usar:"
+    read sistemaArq
     montar_particao "$dispositivo" "$diretorio"
 }
 
@@ -44,7 +46,7 @@ processar_opcao() {
         1) echo "Você selecionou a opção 1." ;;
         2) echo "Você selecionou a opção 2." ;;
         3) echo "Você selecionou a opção 3." ;;
-        4) realizar_funcao_especial ;;
+        4) func_montar_particao ;;
         5) echo "Programa finalizado." ;;
         *) echo "Opção inválida. Por favor, escolha novamente." ;;
     esac
@@ -53,7 +55,7 @@ processar_opcao() {
 montar_particao() {
     # Verifica se o dispositivo de bloco existe
     if [ ! -e "$1" ]; then
-        echo "O dispositivo de bloco '$1' não existe."
+        echo "Não existe dispositivos externos para montar o dispositivo"
         return 1
     fi
 
@@ -74,7 +76,7 @@ montar_particao() {
     fi
 
     # Monta a partição
-    if sudo mount -t ntfs "$1" "$2"; then
+    if sudo mount -t "$3" "$1" "$2"; then
         echo "Partição montada com sucesso em $2."
     else
         echo "Erro ao montar a partição."
