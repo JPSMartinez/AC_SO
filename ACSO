@@ -23,7 +23,7 @@ menu() {
     echo "Menu de Escolhas:"
     echo "  1) Escolha 1"
     echo "  2) Escolha 2"
-    echo "  3) Escolha 3"
+    echo "  3) Como adicionar mais armazenamento na MV"
     echo "  4) Montar Partição"
     echo "  5) Finalizar Programa"
     echo ""
@@ -40,12 +40,19 @@ func_montar_particao() {
     montar_particao "$dispositivo" "$diretorio"
 }
 
+func_comunica_gpt() {
+    firefox "https://chatgpt.com/?oai-dm=1&q=Como+adicionar+mais+memoria+a+Maquina+Virtual
+
+"
+}
+
+
 processar_opcao() {
     read opcao
     case $opcao in
         1) echo "Você selecionou a opção 1." ;;
         2) echo "Você selecionou a opção 2." ;;
-        3) echo "Você selecionou a opção 3." ;;
+        3) func_comunica_gpt ;;
         4) func_montar_particao ;;
         5) echo "Programa finalizado." ;;
         *) echo "Opção inválida. Por favor, escolha novamente." ;;
