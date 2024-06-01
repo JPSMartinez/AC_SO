@@ -1,3 +1,4 @@
+#!/bin/bash
 menu() {
     clear
     dia=$(date +%d)
@@ -37,7 +38,7 @@ func_montar_particao() {
     read diretorio
     echo "Digite o Sistema de Arquivo que deseja usar:"
     read sistemaArq
-    montar_particao "$dispositivo" "$diretorio"
+    montar_particao "$dispositivo" "$diretorio" "$sistemaArq"
 }
 
 func_comunica_gpt() {
@@ -61,15 +62,22 @@ processar_opcao() {
 
 montar_particao() {
     # Verifica se o dispositivo de bloco existe
-    if [ ! -e "$1" ]; then
+    
+    
+    sudo fdisk -l "$dispositivo"
+    sudo fdisk "$dispositivo"
+    sudo partprobe "$dispositivo"
+    nova_particao=$(ls ${dispositivo}* | tail -n 1)
+    sudo mkfs -t "$sistemaArq" "$nova_particao"  
+    if [ ! -e "$dispositivo" ]; then
         echo "Não existe dispositivos externos para montar o dispositivo"
         return 1
     fi
 
     # Verifica se o diretório de montagem já existe, se não, cria
-    if [ ! -d "$2" ]; then
+    if [ ! -d "$diretorio" ]; then
         echo "O diretório de montagem não existe. Criando..."
-        if sudo mkdir -p "$2"; then
+        if sudo mkdir -p "$diretorio"; then
             echo "Diretório de montagem criado com sucesso."
         else
             echo "Erro ao criar o diretório de montagem."
@@ -77,14 +85,10 @@ montar_particao() {
         fi
     fi
 
-    # Tenta desmontar a partição se já estiver montada
-    if grep -qs "$2" /proc/mounts; then
-        sudo umount "$2"
-    fi
 
     # Monta a partição
-    if sudo mount -t "$3" "$1" "$2"; then
-        echo "Partição montada com sucesso em $2."
+    if sudo mount -t "$sistemaArq" "$dispositivo" "$diretorio"; then
+        echo "Partição montada com sucesso em $diretorio."
     else
         echo "Erro ao montar a partição."
         return 1
