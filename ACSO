@@ -4,6 +4,8 @@ VERMELHO='\033[0;31m'
 VERDE='\033[0;32m'
 AMARELO='\033[0;33m'
 PRETO='\033[30m'
+AZUL='\033[0;34m'
+CIANO='\033[0;36m'
 
 FUNDO_BRANCO='\033[47m'
 
@@ -26,24 +28,21 @@ menu() {
     mes=$(date +%B)
     ano=$(date +%Y)
 
-    formatacao_data=$(printf "%-59s" "# Rio de Janeiro, $dia de $mes de $ano")
-
-    AZUL='\033[0;34m'
-    CIANO='\033[0;36m'
-    RESET='\033[0M'
+    texto_data="# Rio de Janeiro, ${AZUL}$dia${NC} de ${AZUL}$mes${NC} de ${AZUL}$ano${NC}"
+    formatacao_data=$(printf "%-59s" "$texto_data")
 
     echo "############################################################"
     echo "# IBMEC                                                    #"
-    echo "# Sistemas Operacionais                 Semestre 1 de 2024 #"
+    echo -e "# Sistemas Operacionais                 Semestre ${AZUL}1${NC} de ${AZUL}2024${NC} #"
     echo "# Código IBM8940                        Turma 8001         #"
     echo "# Professor: Luiz Fernando T. Farias                       #"
     echo "#----------------------------------------------------------#"
     echo "# Equipe Desenvolvedora:                                   #"
-    echo "#   Aluno: João Pedro Martinez                             #"
-    echo "#   Aluno: Phillipe Secondo                                #"
+    echo -e "#   Aluno: ${CIANO}João Pedro Martinez${NC}                             #"
+    echo -e "#   Aluno: ${CIANO}Phillipe Secondo${NC}                                #"
     echo "#----------------------------------------------------------#"
-    echo "${formatacao_data}#"
-    echo "# Hora do Sistema: $(date +%H) horas e $(date +%M) minutos                   #"
+    echo -e "$formatacao_data #"
+    echo -e "# Hora do Sistema: ${AZUL}$(date +%H)${NC} horas e ${AZUL}$(date +%M)${NC} minutos                   #"
     echo "############################################################"
     echo ""
     echo "Menu de Escolhas:"
@@ -78,9 +77,9 @@ montar_particao() {
     sudo mkdir "$particao_criada"
     
     sudo mount "$particao" "$particao_criada"
-    
+	
     lsblk -f
-    sleep 7
+    sleep 10    
 }
 # ------------------- Inicio Gerenciador de Recursos ----------------------
 
@@ -176,33 +175,6 @@ uptime_sistema() {
 	segundos=$((segundos_totais%60))
 
 	uptime=$(printf "Uptime         : %02d:%02d:%02d\n" $horas $minutos $segundos)
-}
-
-print_recurso_disco() {
-	echo "_________________________________________________________"
-	
-	for disco in ${discos[@]};do
-		IFS=' ' read -r -a disco_info <<< "$disco"
-		printf "%-12s %-9s %-14s %-11s %-17s\n" "${disco_info[0]}" "${disco_info[1]}" "${disco_info[2]}" "${disco_info[3]}" "${disco_info[4]}"
-	done
-}
-
-recurso_disco() {
-	
-
-	# nome leituras setores_lidos Gravacoes Setores_Gravados 
-	grep '\bsd[a-z]\b' /proc/diskstats | while read -r linha; do
-		
-		array_linha=($linha)
-		declare -a disco=()	
-		disco+=${array_linha[2]}
-		disco+=${array_linha[3]}
-		disco+=${array_linha[5]}
-		disco+=${array_linha[7]}
-		disco+=${array_linha[9]}
-
-		discos+=$disco
-	done
 }
 
 recurso_memoria() {
