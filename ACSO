@@ -1,25 +1,12 @@
 #!/bin/bash
 
-main() {
-	while :;do
-		menu
-		processar_opcao
-	done
-}
-
 menu() {
-
-    trap '' SIGINT
     clear
     dia=$(date +%d)
     mes=$(date +%B)
     ano=$(date +%Y)
 
     formatacao_data=$(printf "%-59s" "# Rio de Janeiro, $dia de $mes de $ano")
-
-    AZUL='\033[0;34m'
-    CIANO='\033[0;36m'
-    RESET='\033[0M'
 
     echo "############################################################"
     echo "# IBMEC                                                    #"
@@ -36,7 +23,7 @@ menu() {
     echo "############################################################"
     echo ""
     echo "Menu de Escolhas:"
-    echo "  1) Gerenciador de Recursos"
+    echo "  1) Escolha 1"
     echo "  2) Escolha 2"
     echo "  3) Como adicionar mais armazenamento na MV"
     echo "  4) Montar Partição"
@@ -67,199 +54,16 @@ montar_particao() {
     sudo mkdir "$particao_criada"
     
     sudo mount "$particao" "$particao_criada"
-# ------------------- Inicio Gerenciador de Recursos ----------------------
-
-uso_cpu=0
-
-uptime=0
-
-let soma_cpu=0
-ultima_leitura_cpu=0
-let soma_ultima_leitura_cpu=0
-
-let mem_total=0
-let mem_livre=0
-let mem_disponivel=0
-let mem_em_uso=0
-mem_em_uso_pct=0
-
-declare -a discos=()
-
-gerenciador_de_recursos() {
-	trap '' SIGINT
-	stty -echo -icanon time 0 min 0
-	
-	while :;do
-		key=$(dd bs=1 count=1 2>/dev/null)
-		if [[ $key == 'q' ]]; then
-			break
-		fi
-
-		recursos_cpu
-		recurso_memoria
-
-		clear
-
-		interface_de_recursos
-
-		sleep 2
-	done
-
-	stty sane
-}
-
-interface_de_recursos() {
-	uptime_sistema
-	echo "$uptime"
-	print_uso_cpu
-	print_recursos_memoria
-}
-
-print_recursos_memoria() {
-	echo "Mem Total      : $mem_total GB"
-        echo "Mem Livre      : $mem_livre GB"
-        echo "Mem Disponivel : $mem_disponivel GB"
-        echo "Mem em uso     : $mem_em_uso GB"
-        echo "Mem em uso     : $mem_em_uso_pct %"
-}
-
-print_uso_cpu() {
-
-	VERMELHO='\033[0;31m'
-	VERDE='\033[0;32m'
-	AMARELO='\033[0;33m'
-
-	NC='\033[0m'
-	local n_barras=$(echo "scale=0; $uso_cpu / 10" | bc)
-	
-	pipes=$(printf "%${n_barras}s" | tr ' ' '|')
-
-	if [ $n_barras -le 5 ];then
-		pipes=$(echo -e "${VERDE}${pipes}${NC}")
-		uso_cpu=$(echo -e "${VERDE}${uso_cpu}%${NC}")
-	elif [ $n_barras -gt 5 ] && [ $n_barras -lt 8 ];then
-		pipes=$(echo -e "${AMARELO}${pipes}${NC}")
-		uso_cpu=$(echo -e "${AMARELO}${uso_cpu}%${NC}")
-	else
-		pipes=$(echo -e "${VERMELHO}${pipes}${NC}")
-		uso_cpu=$(echo -e "${VERMELHO}${uso_cpu}%${NC}")
-	fi
-
-	pontos=$(printf "%$((10 - n_barras))s" | tr ' ' '.')
-	
-	barra="[$pipes$pontos]"
-
-	echo "Uso de CPU     : $barra$uso_cpu"
-}
-
-uptime_sistema() {
-	linha_uptime=($(head -n 1 /proc/uptime))
-	
-	segundos_totais=${linha_uptime[0]}
-	segundos_totais=${segundos_totais%.*}
-
-	horas=$((segundos_totais/3600))
-	minutos=$(((segundos_totais%3600)/60))
-	segundos=$((segundos_totais%60))
-
-	uptime=$(printf "Uptime         : %02d:%02d:%02d\n" $horas $minutos $segundos)
-}
-
-print_recurso_disco() {
-	echo "_________________________________________________________"
-	
-	for disco in ${discos[@]};do
-		IFS=' ' read -r -a disco_info <<< "$disco"
-		printf "%-12s %-9s %-14s %-11s %-17s\n" "${disco_info[0]}" "${disco_info[1]}" "${disco_info[2]}" "${disco_info[3]}" "${disco_info[4]}"
-	done
-}
-
-recurso_disco() {
-	
-
-	# nome leituras setores_lidos Gravacoes Setores_Gravados 
-	grep '\bsd[a-z]\b' /proc/diskstats | while read -r linha; do
-		
-		array_linha=($linha)
-		declare -a disco=()	
-		disco+=${array_linha[2]}
-		disco+=${array_linha[3]}
-		disco+=${array_linha[5]}
-		disco+=${array_linha[7]}
-		disco+=${array_linha[9]}
-
-		discos+=$disco
-	done
-}
-
-recurso_memoria() {
-	linha_mem_total=($(head -n 1 /proc/meminfo))
-	linha_mem_livre=($(head -n 2 /proc/meminfo | tail -n 1))	
-	linha_mem_disponivel=($(head -n 3 /proc/meminfo | tail -n 1))
-
-	mem_total=${linha_mem_total[1]}
-	mem_livre=${linha_mem_livre[1]}
-	mem_disponivel=${linha_mem_disponivel[1]}
-
-	mem_em_uso=$((mem_total - mem_disponivel))
-	mem_em_uso_pct=$(echo "scale=2; $mem_em_uso / $mem_total * 100" | bc)
-
-	mem_total=$(echo "scale=1; $mem_total / 1000000" | bc)
-	
-	mem_livre=$(echo "scale=1; $mem_livre / 1000000" | bc)
-
-	mem_disponivel=$(echo "scale=1; $mem_disponivel / 1000000" | bc)
-
-	mem_em_uso=$(echo "scale=1; $mem_em_uso / 1000000" | bc)
-}
-
-recursos_cpu() {
-	linha_cpu=($(head -n1 /proc/stat))
-
-	soma_valores_cpu "${linha_cpu[@]:1}"
-	
-	cpu_delta=$((soma_cpu - soma_ultima_leitura_cpu))
-	cpu_idle=$((linha_cpu[4] - ultima_leitura_cpu[4]))
-	cpu_utilizado=$((cpu_delta - cpu_idle))
-	uso_cpu=$(echo "scale=1; 100 * $cpu_utilizado / $cpu_delta" | bc -l)
-	uso_cpu=$(echo "$uso_cpu" | sed 's/^\./0./')
-
-	ultima_leitura_cpu=("${linha_cpu[@]}")
-	soma_ultima_leitura_cpu=$soma_cpu	
-}
-
-soma_valores_cpu() {
-	local soma=0
-
-	for valor in "$@";do
-		soma=$((soma + valor))
-	done
-
-	soma_cpu=$soma
-}
-
-# -------------------- Fim Gerenciador de Recursos --------------------------
-
-func_montar_particao() {
-    echo "Digite o dispositivo/partição que deseja montar (ex: /dev/sdb1):"
-    read dispositivo
-    echo "Digite o diretório de montagem desejado:"
-    read diretorio
-    echo "Digite o Sistema de Arquivo que deseja usar:"
-    read sistemaArq
-    montar_particao "$dispositivo" "$diretorio" "$sistemaArq"
 }
 
 processar_opcao() {
     read -r opcao
     case $opcao in
-        1) gerenciador_de_recursos ;;
+        1) echo "Você selecionou a opção 1." ;;
         2) echo "Você selecionou a opção 2." ;;
         3) func_comunica_gpt ;;
-        4) func_montar_particao ;;
-        5) echo "Programa finalizado."
-	       exit
-       	       ;;
+        4) montar_particao ;;
+        5) echo "Programa finalizado." ;;
         *) echo "Opção inválida. Por favor, escolha novamente." ;;
     esac
 }
@@ -268,4 +72,5 @@ func_comunica_gpt() {
     firefox "https://chatgpt.com/?oai-dm=1&q=Como+adicionar+um+dispositivo+na+Maquina+Virtual+Virtual+Box+Oracle"
 }
 
-main
+menu
+processar_opcao
