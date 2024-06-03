@@ -48,7 +48,7 @@ menu() {
     echo ""
     echo "Menu de Escolhas:"
     echo "  1) Gerenciador de Recursos"
-    echo "  2) Escolha 2"
+    echo "  2) Gerenciador de senhas"
     echo "  3) Perguntar ao ChatGPT"
     echo "  4) Montar Partição"
     echo "  5) Finalizar Programa"
@@ -121,6 +121,7 @@ gerenciador_de_recursos() {
 	done
 
 	stty sane
+	stty erase ^H
 }
 
 interface_de_recursos() {
@@ -252,6 +253,101 @@ soma_valores_cpu() {
 
 # -------------------- Fim Gerenciador de Recursos --------------------------
 
+# -------------------- Inicio Gerenciador de Senhas -------------------------
+
+password=1548645534
+
+interface_gerenciador_senhas() {
+	clear
+	echo "1) Salvar nova senha"
+	echo "2) Excluir senha"
+	echo "3) Listar senhas"
+
+	read -p "Selecione uma opção: " -r opcao
+	case $opcao in
+		1) salvar_nova_senha;;
+		2) excluir_conta;;
+		3) listar_senhas;;
+	esac
+}
+
+excluir_conta() {
+	printa_senhas
+	read -p "Digite o numero da senha a ser excluida: " linha
+
+	descriptografar_arquivo
+	
+	sed -i "${linha}d" /home/virtual/AC_SO/senhas.txt
+
+	criptografar_arquivo
+}
+
+listar_senhas(){
+	printa_senhas
+	read -p "Pressione qualquer tecla  para sair" -n1 -s
+}
+
+printa_senhas() {
+	clear
+
+	descriptografar_arquivo
+	
+	sleep 20
+
+	let n_linha=1
+	while IFS= read linha
+	do
+		echo "$n_linha) ${linha[0]}	${linha[1]}"
+		n_linha=$((n_linha + 1))
+	done < "/home/virtual/AC_SO/senhas.txt"
+
+	sleep 20
+
+	criptografar_arquivo
+}
+
+salvar_nova_senha() {
+	clear
+
+	read -p "Informe o identificador para a senha: " identificador 
+	read -p "Informe o email para essa senha: " email
+
+	stty -echo
+	read -p "Informe a senha: " senha
+	stty echo
+
+	salva_arquivo_pass "$identificador" "$email" "$senha"
+
+}
+
+salva_arquivo_pass() {
+	if [ -e "/home/virtual/AC_SO/senhas.enc" ];then
+		descriptografar_arquivo
+		echo "$1 $2 $3" >> senhas.txt
+	else
+		echo "$1 $2 $3" >> senhas.txt
+	fi
+	sleep 20
+	criptografar_arquivo
+
+}
+
+abri_arquivo_pass() {
+	descriptografar_arquivo
+}
+
+criptografar_arquivo() {
+	openssl enc -aes-256-cbc -in "/home/virtual/AC_SO/senhas.txt" -out "/home/virtual/AC_SO/senhas.enc" -pass pass:"$password" -pbkdf2 -iter 100000
+	rm "/home/virtual/AC_SO/senhas.txt"
+}
+
+descriptografar_arquivo() {
+	openssl enc -d -aes-256-cbc -in "/home/virtual/AC_SO/senhas.enc" -out "/home/virtual/AC_SO/senhas.txt" -pass pass:"$password" -pbkdf2 -iter 100000
+	#rm "/home/virtual/AC_SO/senhas.enc"
+}
+
+# -------------------- Fim Gerenciador de Senhas ----------------------------
+
 
 finalizar_programa() {
 	stty erase ^H
@@ -264,7 +360,7 @@ processar_opcao() {
     read -r opcao
     case $opcao in
         1) gerenciador_de_recursos ;;
-        2) echo "Você selecionou a opção 2." ;;
+        2) interface_gerenciador_senhas ;;
         3) processa_pesquisa_chatgpt ;;
         4) montar_particao ;;
         5) finalizar_programa;;
