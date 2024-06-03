@@ -1,4 +1,5 @@
 #!/bin/bash
+
 menu() {
     clear
     dia=$(date +%d)
@@ -31,72 +32,45 @@ menu() {
     echo "Selecione uma opção:"
 }
 
-func_montar_particao() {
-    echo "Digite o dispositivo/partição que deseja montar (ex: /dev/sdb1):"
-    read dispositivo
-    echo "Digite o diretório de montagem desejado:"
-    read diretorio
+montar_particao() {
+    echo "Digite o dispositivo/partição que deseja criar (ex: /dev/sdb):"
+    read  dispositivo
+    echo "Digite a partição a ser formatada (ex: /dev/sdb1):"
+    read  particao
     echo "Digite o Sistema de Arquivo que deseja usar:"
-    read sistemaArq
-    montar_particao "$dispositivo" "$diretorio" "$sistemaArq"
+    read  sistemaArq
+    echo "Digite o diretório de montagem:"
+    read  particao_criada
+
+    if [ ! -e "$dispositivo" ]; then
+        echo "Dispositivo não conectado"
+        return 1
+    fi
+    
+    echo -e "n\np\n\n\n\nw" | sudo fdisk "$dispositivo"
+    
+    sudo mkfs."$sistemaArq" "$particao"
+    
+    sudo mkdir "$particao_criada"
+    
+    sudo mount "$particao" "$particao_criada"
 }
-
-func_comunica_gpt() {
-    firefox "https://chatgpt.com/?oai-dm=1&q=Como+adicionar+mais+memoria+a+Maquina+Virtual
-
-"
-}
-
 
 processar_opcao() {
-    read opcao
+    read -r opcao
     case $opcao in
         1) echo "Você selecionou a opção 1." ;;
         2) echo "Você selecionou a opção 2." ;;
         3) func_comunica_gpt ;;
-        4) func_montar_particao ;;
+        4) montar_particao ;;
         5) echo "Programa finalizado." ;;
         *) echo "Opção inválida. Por favor, escolha novamente." ;;
     esac
 }
 
-montar_particao() {
-    # Verifica se o dispositivo de bloco existe
-    
-    
-    sudo fdisk -l "$dispositivo"
-    sudo fdisk "$dispositivo"
-    sudo partprobe "$dispositivo"
-    nova_particao=$(ls ${dispositivo}* | tail -n 1)
-    sudo mkfs -t "$sistemaArq" "$nova_particao"  
-    if [ ! -e "$dispositivo" ]; then
-        echo "Não existe dispositivos externos para montar o dispositivo"
-        return 1
-    fi
-
-    # Verifica se o diretório de montagem já existe, se não, cria
-    if [ ! -d "$diretorio" ]; then
-        echo "O diretório de montagem não existe. Criando..."
-        if sudo mkdir -p "$diretorio"; then
-            echo "Diretório de montagem criado com sucesso."
-        else
-            echo "Erro ao criar o diretório de montagem."
-            return 1
-        fi
-    fi
-
-
-    # Monta a partição
-    if sudo mount -t "$sistemaArq" "$dispositivo" "$diretorio"; then
-        echo "Partição montada com sucesso em $diretorio."
-    else
-        echo "Erro ao montar a partição."
-        return 1
-    fi
+func_comunica_gpt() {
+    firefox "https://chatgpt.com/?oai-dm=1&q=Como+adicionar+um+dispositivo+na+Maquina+Virtual+Virtual+Box+Oracle"
 }
-
-
-
 
 menu
 processar_opcao
