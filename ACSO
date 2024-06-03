@@ -1,5 +1,16 @@
 #!/bin/bash
 
+VERMELHO='\033[0;31m'
+VERDE='\033[0;32m'
+AMARELO='\033[0;33m'
+PRETO='\033[30m'
+
+FUNDO_BRANCO='\033[47m'
+
+NEGRITO='\033[1m'
+
+NC='\033[0m'
+
 main() {
 	while :;do
 		menu
@@ -38,7 +49,7 @@ menu() {
     echo "Menu de Escolhas:"
     echo "  1) Gerenciador de Recursos"
     echo "  2) Escolha 2"
-    echo "  3) Como adicionar mais armazenamento na MV"
+    echo "  3) Perguntar ao ChatGPT"
     echo "  4) Montar Partição"
     echo "  5) Finalizar Programa"
     echo ""
@@ -67,6 +78,10 @@ montar_particao() {
     sudo mkdir "$particao_criada"
     
     sudo mount "$particao" "$particao_criada"
+    
+    lsblk -f
+    sleep 7
+}
 # ------------------- Inicio Gerenciador de Recursos ----------------------
 
 uso_cpu=0
@@ -109,6 +124,7 @@ gerenciador_de_recursos() {
 }
 
 interface_de_recursos() {
+	echo -e "${FUNDO_BRANCO}${PRETO}Aperte a tecla q para sair${NC}"
 	uptime_sistema
 	echo "$uptime"
 	print_uso_cpu
@@ -125,11 +141,7 @@ print_recursos_memoria() {
 
 print_uso_cpu() {
 
-	VERMELHO='\033[0;31m'
-	VERDE='\033[0;32m'
-	AMARELO='\033[0;33m'
-
-	NC='\033[0m'
+	
 	local n_barras=$(echo "scale=0; $uso_cpu / 10" | bc)
 	
 	pipes=$(printf "%${n_barras}s" | tr ' ' '|')
@@ -240,14 +252,12 @@ soma_valores_cpu() {
 
 # -------------------- Fim Gerenciador de Recursos --------------------------
 
-func_montar_particao() {
-    echo "Digite o dispositivo/partição que deseja montar (ex: /dev/sdb1):"
-    read dispositivo
-    echo "Digite o diretório de montagem desejado:"
-    read diretorio
-    echo "Digite o Sistema de Arquivo que deseja usar:"
-    read sistemaArq
-    montar_particao "$dispositivo" "$diretorio" "$sistemaArq"
+
+finalizar_programa() {
+	stty erase ^H
+	clear
+	exit
+	echo "Programa Finalizado"
 }
 
 processar_opcao() {
@@ -255,17 +265,22 @@ processar_opcao() {
     case $opcao in
         1) gerenciador_de_recursos ;;
         2) echo "Você selecionou a opção 2." ;;
-        3) func_comunica_gpt ;;
-        4) func_montar_particao ;;
-        5) echo "Programa finalizado."
-	       exit
-       	       ;;
+        3) processa_pesquisa_chatgpt ;;
+        4) montar_particao ;;
+        5) finalizar_programa;;
         *) echo "Opção inválida. Por favor, escolha novamente." ;;
     esac
 }
 
+processa_pesquisa_chatgpt() {
+	echo "Informe a mensagem para o ChatGPT: "
+	read mensagem
+	mensagem_url=$(echo "$mensagem" | sed 's/ /+/g')
+	func_comunica_gpt $mensagem_url
+}
+
 func_comunica_gpt() {
-    firefox "https://chatgpt.com/?oai-dm=1&q=Como+adicionar+um+dispositivo+na+Maquina+Virtual+Virtual+Box+Oracle"
+    firefox "https://chatgpt.com/?oai-dm=1&q=$1"
 }
 
 main
