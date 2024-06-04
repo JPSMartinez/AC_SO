@@ -7,7 +7,7 @@ Professor: Luis Fernando Teixeira de Farias
 Descrição Geral:
 
 
-O script apresentado é um programa em Bash desenvolvido para ter 5 opções, sendo cada uma delas: Gerenciador de Recursos, Gerenciador de senhas, Interação com o Chat GPT e uma opção para montar uma partição e formatá-la. O script é dividido em várias sub-rotinas que facilitam a execução de suas diferentes funcionalidades.
+	O script apresentado é um programa em Bash desenvolvido para ter 5 opções, sendo cada uma delas: Gerenciador de Recursos, Gerenciador de senhas, Interação com o Chat GPT e uma opção para montar uma partição e formatá-la. O script é dividido em várias sub-rotinas que facilitam a execução de suas diferentes funcionalidades.
 
 
 Módulos:
@@ -28,49 +28,49 @@ Módulos:
 Comandos:
 
 
-date: Informa a data no terminal
-* +%d: Retorna o dia.
-* +%B: Retorna o mês.
-* +%Y: Retorna o ano.
-* +%H: Retorna a hora.
-* +%M: Retorna os minutos.
-echo: Permite imprimir algo no terminal
-* -e: Permite utilizar os escapes com contrabarra.
-printf: É um comando que exibe e formata argumentos
-* %-59s: Permite justificar o texto a esquerda a partir de uma string.
+	date: Informa a data no terminal
+	* +%d: Retorna o dia.
+	* +%B: Retorna o mês.
+	* +%Y: Retorna o ano.
+	* +%H: Retorna a hora.
+	* +%M: Retorna os minutos.
+	echo: Permite imprimir algo no terminal
+	* -e: Permite utilizar os escapes com contrabarra.
+	printf: É um comando que exibe e formata argumentos
+	* %-59s: Permite justificar o texto a esquerda a partir de uma string.
 
 
 3- Montar Partição:
 
 
-        Solicita ao usuário informações sobre a partição a ser criada e monta a partição         específica. O processo inclui a formatação de um Sistema de Arquivos e montagem no diretório especificado.
+    Solicita ao usuário informações sobre a partição a ser criada e monta a partição         específica. O processo inclui a formatação de um Sistema de Arquivos e montagem no diretório especificado.
 
 
-echo -e “n\np\n\n\n\nw” | sudo fdisk “$dispositivo:”O comando `fdisk` é usado para criar uma nova partição em um dispositivo de bloco. Ele é executado com `sudo` para obter privilégios de administrador. O `echo -e` passa automaticamente os parâmetros necessários ao `fdisk`:
+	echo -e “n\np\n\n\n\nw” | sudo fdisk “$dispositivo:”O comando `fdisk` é usado para criar uma nova partição em um dispositivo de bloco. Ele é executado com `sudo` para obter privilégios de administrador. O `echo -e` passa automaticamente os parâmetros necessários ao `fdisk`:
 
 
-* `n` cria uma nova partição.
-* `p` especifica que a partição é primária.
-* As quebras de linha (`\n`) aceitam os valores padrão para o número da partição e os setores inicial e final.
-* `w` grava a tabela de partição no disco e sai.
+	* `n` cria uma nova partição.
+	* `p` especifica que a partição é primária.
+	* As quebras de linha (`\n`) aceitam os valores padrão para o número da partição e os setores inicial e final.
+	* `w` grava a tabela de partição no disco e sai.
 
 
-Essa linha de comando cria uma partição primária no dispositivo especificado usando os valores padrão, sem necessidade de intervenção manual.
+	Essa linha de comando cria uma partição primária no dispositivo especificado usando os valores padrão, sem necessidade de intervenção manual.
 
 
-sudo mkfs.”$sistemaArq” “$particao”: Formata a partição especificada com o tipo de sistema de arquivos definido na variável sistemaArq, utilizando privilégios administrativos.
+	sudo mkfs.”$sistemaArq” “$particao”: Formata a partição especificada com o tipo de sistema de arquivos definido na variável sistemaArq, utilizando privilégios administrativos.
 
 
-sudo mkdir “$particao_criada”: Cria um novo diretório especificado pela variável particao_criada, usando privilégios administrativos para garantir que o diretório possa ser criado em locais restritos do sistema de arquivos.
+	sudo mkdir “$particao_criada”: Cria um novo diretório especificado pela variável particao_criada, usando privilégios administrativos para garantir que o diretório possa ser criado em locais restritos do sistema de arquivos.
 
 
-sudo mount “$particao” “$particao_criada”: Monta a partição especificada pela variável particao no diretório especificado pela variável particao_criada, usando privilégios administrativos para garantir que a operação seja bem-sucedida.
+	sudo mount “$particao” “$particao_criada”: Monta a partição especificada pela variável particao no diretório especificado pela variável particao_criada, usando privilégios administrativos para garantir que a operação seja bem-sucedida.
 
 
-lsblk -f: Exibe uma lista detalhada de todos os dispositivos de bloco e suas partições, mostrando informações sobre os sistemas de arquivos presentes em cada um deles. É útil para verificar o estado e a configuração dos discos e partições no sistema.
+	lsblk -f: Exibe uma lista detalhada de todos os dispositivos de bloco e suas partições, mostrando informações sobre os sistemas de arquivos presentes em cada um deles. É útil para verificar o estado e a configuração dos discos e partições no sistema.
 
 
-sleep 10: Congela o programa por 10 segundos.
+	sleep 10: Congela o programa por 10 segundos.
 
 
 
@@ -82,162 +82,147 @@ sleep 10: Congela o programa por 10 segundos.
 Comandos:
 
 
-trap ‘’ SIGINT: Comando utilizado para desabilitar o sinal SIGINT da tecla ctrl+c
-stty -echo -icanon time 0 min 0: 
-* stty: é um comando para alteração de configurações do terminal. -echo faz com que os caracteres digitados não apareçam no terminal.
-* -icanon: faz com que os caracteres sejam passados diretamente para a aplicação ao invés de linha a linha no terminal.
-* time 0: faz com que as entradas sejam passadas imediatamente.
-* min 0: faz com que o terminal não espere um número mínimo de caracteres para a entrada ser passada para a aplicação.
-dd bs=1 count=1 2>/dev/null: Lê 1 Byte da entrada padrão para colocá-lo na variável key, caso ocorra erro ele será redirecionado para  /dev/null
-sleep 2: Faz o script pausar por 2 segundos.
-stty sane: Restaura as configurações padrão do terminal
-stty erase ^H: Restaura o backspace no terminal
+	trap ‘’ SIGINT: Comando utilizado para desabilitar o sinal SIGINT da tecla ctrl+c
+	stty -echo -icanon time 0 min 0: 
+	* stty: é um comando para alteração de configurações do terminal. -echo faz com que os caracteres digitados não apareçam no terminal.
+	* -icanon: faz com que os caracteres sejam passados diretamente para a aplicação ao invés de linha a linha no terminal.
+	* time 0: faz com que as entradas sejam passadas imediatamente.
+	* min 0: faz com que o terminal não espere um número mínimo de caracteres para a entrada ser passada para a aplicação.
+	dd bs=1 count=1 2>/dev/null: Lê 1 Byte da entrada padrão para colocá-lo na variável key, caso ocorra erro ele será redirecionado para  /dev/null
+	sleep 2: Faz o script pausar por 2 segundos.
+	stty sane: Restaura as configurações padrão do terminal
+	stty erase ^H: Restaura o backspace no terminal
 
 
 4.1- Interface_de_recursos:
 
 
-        Exibe a interface do gerenciador de recursos, mostrando tempo de atividade do sistema, uso de CPU e uso de memória.
+	Exibe a interface do gerenciador de recursos, mostrando tempo de atividade do sistema, uso de CPU e uso de memória.
 
 
 4.2- Print_recursos_memória
-         Imprime na tela os recursos de memória.
+	Imprime na tela os recursos de memória.
 
 
-echo “scale=2; ($mem_em_uso_pct / 100) * 20” | bc | awk ‘{print int($1)}’): Faz com que o comando bc realize a conta dentro do echo com 2 casas decimais e depois passa o valor para o awk pegar somente a parte inteira do resultado
+	echo “scale=2; ($mem_em_uso_pct / 100) * 20” | bc | awk ‘{print int($1)}’): Faz com que o comando bc realize a conta dentro do echo com 2 casas decimais e depois passa o valor para o awk pegar somente a parte inteira do resultado
 tr ‘ ’ ‘|’: Substitui os espaços vazios por |.
 
 
 4.3- Uptime_sistema
-        Calcula o tempo que o sistema está ligado.
+	Calcula o tempo que o sistema está ligado.
 
 
-($(head -n 1 /proc/uptime)): Pega a primeira linha do arquivo /proc/uptime
+	($(head -n 1 /proc/uptime)): Pega a primeira linha do arquivo /proc/uptime
 
 
 4.4- Recurso_memória
-        Extrai as informações de memória do /proc/meminfo
-tail -n 1: Pega a última linha do arquivo.
-sed 's/^\./0./': Adiciona antes do 0 antes do . para caso de números reais positivos menores que 1.
+    Extrai as informações de memória do /proc/meminfo
+	tail -n 1: Pega a última linha do arquivo.
+	sed 's/^\./0./': Adiciona antes do 0 antes do . para caso de números reais positivos menores que 1.
 
 
 4.5- Recursos_CPU
-        Extrai informações de cpu do arquivo /proc/stat
+	Extrai informações de cpu do arquivo /proc/stat
 
 
 5- Gerenciador_de_senhas:
 
 
-        Exibe o menu do gerenciador de senhas, permitindo ao usuário salvar uma nova senha, excluir uma senha existente ou listar todas as senhas.
+	Exibe o menu do gerenciador de senhas, permitindo ao usuário salvar uma nova senha, excluir uma senha existente ou listar todas as senhas.
 
 
 5.1- Interface_erenciador_senhas
-        Exibe as opções disponíveis e trata a opção selecionada pelo usuário.
+    Exibe as opções disponíveis e trata a opção selecionada pelo usuário.
 
 
 5.2- Excluir_conta
-        Exibe na tela a lista de contas salvas e pede ao usuário para selecionar uma para exclusão, salvando o arquivo de senhas criptografado.
+    Exibe na tela a lista de contas salvas e pede ao usuário para selecionar uma para exclusão, salvando o arquivo de senhas criptografado.
 
 
-sed -i "${linha}d" /home/virtual/AC_SO/senhas.txt: Remove a linha especificada (${linha}) do arquivo /home/virtual/AC_SO/senhas.txt. O parâmetro -i faz com que a edição seja realizada diretamente no arquivo, em vez de criar um novo.
+	sed -i "${linha}d" /home/virtual/AC_SO/senhas.txt: Remove a linha especificada (${linha}) do arquivo /home/virtual/AC_SO/senhas.txt. O parâmetro -i faz com que a edição seja realizada diretamente no arquivo, em vez de criar um novo.
 
 
 5.3- Listar_senhas
-        Lista todas as senhas salvas pelo usuário, descriptografa o arquivo de senhas e criptografa novamente após exibi-las.
+	Lista todas as senhas salvas pelo usuário, descriptografa o arquivo de senhas e criptografa novamente após exibi-las.
 
 
-read -p "Pressione qualquer tecla  para sair" -n1 -s: Este comando solicita ao usuário que pressione qualquer tecla para sair, exibindo uma mensagem na linha de comando. Ele aguarda a entrada do usuário de um único caractere (-n1) de forma silenciosa (-s) e exibe a mensagem "Pressione qualquer tecla para sair" (-p).
+	read -p "Pressione qualquer tecla  para sair" -n1 -s: Este comando solicita ao usuário que pressione qualquer tecla para sair, exibindo uma mensagem na linha de comando. Ele aguarda a entrada do usuário de um único caractere (-n1) de forma silenciosa (-s) e exibe a mensagem "Pressione qualquer tecla para sair" (-p).
 
 
 5.4- Salvar_nova_senha
-        Pede ao usuário um nome como identificador daquela conta, o email e a senha que deseja salvar e chama a função que salva os dados no arquivo de senhas.
+	Pede ao usuário um nome como identificador daquela conta, o email e a senha que deseja salvar e chama a função que salva os dados no arquivo de senhas.
 
 
 5.5- Salva_arquivo_pass
-        Descriptografa o arquivo de senhas caso exista, insere os dados da conta e depois criptografa o arquivo novamente
+	Descriptografa o arquivo de senhas caso exista, insere os dados da conta e depois criptografa o arquivo novamente
 
 
 5.6- Abri_arquivo_Pass
-        Descriptografa o arquivo de senhas.
-
-
+	Descriptografa o arquivo de senhas.
 
 
 5.7- Criptografar_arquivo
-        Responsável por fazer a criptografia do arquivo de .txt para .enc
+	Responsável por fazer a criptografia do arquivo de .txt para .enc
 
 
-openssl enc -aes-256-cbc -in "/home/virtual/AC_SO/senhas.txt" -out "/home/virtual/AC_SO/senhas.enc" -pass pass:"$password" -pbkdf2 -iter 100000
+	openssl enc -aes-256-cbc -in "/home/virtual/AC_SO/senhas.txt" -out "/home/virtual/AC_SO/senhas.enc" -pass pass:"$password" -pbkdf2 -iter 100000
 rm "/home/virtual/AC_SO/senhas.txt": 
 
 
-O comando `openssl enc` é usado para criptografar um arquivo usando o algoritmo AES-256 em modo CBC. Ele recebe como entrada o arquivo "/home/virtual/AC_SO/senhas.txt", criptografa-o e salva o resultado no arquivo "/home/virtual/AC_SO/senhas.enc". A senha usada para criptografia é especificada pela variável `$password`, e o algoritmo de derivação de chave PBKDF2 é utilizado com 100.000 iterações. Após a criptografia, o arquivo original "senhas.txt" é removido.
+	O comando `openssl enc` é usado para criptografar um arquivo usando o algoritmo AES-256 em modo CBC. Ele recebe como entrada o arquivo "/home/virtual/AC_SO/senhas.txt", criptografa-o e salva o resultado no arquivo "/home/virtual/AC_SO/senhas.enc". A senha usada para criptografia é especificada pela variável `$password`, e o algoritmo de derivação de chave PBKDF2 é utilizado com 100.000 iterações. Após a criptografia, o arquivo original "senhas.txt" é removido.
 
 
 5. 8- Descriptografar_arquivo
-Responsável por fazer a descriptografia o arquivo de .enc para .txt
+	Responsável por fazer a descriptografia o arquivo de .enc para .txt
 
 
-openssl enc -d -aes-256-cbc -in "/home/virtual/AC_SO/senhas.enc" -out "/home/virtual/AC_SO/senhas.txt" -pass pass:"$password" -pbkdf2 -iter 100000
-        #rm "/home/virtual/AC_SO/senhas.enc":
+	openssl enc -d -aes-256-cbc -in "/home/virtual/AC_SO/senhas.enc" -out "/home/virtual/AC_SO/senhas.txt" -pass pass:"$password" -pbkdf2 -iter 100000
+	rm "/home/virtual/AC_SO/senhas.enc":
 
 
-Este comando usa o OpenSSL para decifrar o arquivo criptografado "/home/virtual/AC_SO/senhas.enc" usando o algoritmo AES-256 em modo CBC. Ele utiliza a senha especificada pela variável `$password` para realizar a decifração. O resultado decifrado é então salvo no arquivo "/home/virtual/AC_SO/senhas.txt". O algoritmo de derivação de chave PBKDF2 é empregado com 100.000 iterações para aumentar a segurança da senha. A linha comentada `#rm "/home/virtual/AC_SO/senhas.enc"` sugere que originalmente era usada para excluir o arquivo criptografado após a decifração, mas está desativada.
-
-
+	Este comando usa o OpenSSL para decifrar o arquivo criptografado "/home/virtual/AC_SO/senhas.enc" usando o algoritmo AES-256 em modo CBC. Ele utiliza a senha especificada pela variável `$password` para realizar a decifração. O resultado decifrado é então salvo no arquivo "/home/virtual/AC_SO/senhas.txt". O algoritmo de derivação de chave PBKDF2 é empregado com 100.000 iterações para aumentar a segurança da senha. A linha comentada `rm "/home/virtual/AC_SO/senhas.enc"` sugere que originalmente era usada para excluir o arquivo criptografado após a decifração, mas está desativada.
 
 
 6- Comunicação com Chat GPT:
 
 
-        Permite ao usuário digitar uma mensagem para ser enviada ao Chat GPT. A função ‘func_comunica_gpt’ abre o navegador Firefox com a consulta.
+	Permite ao usuário digitar uma mensagem para ser enviada ao Chat GPT. A função ‘func_comunica_gpt’ abre o navegador Firefox com a consulta.
 
 
-echo “Informe a mensagem para o ChatGPT: ”
+	echo “Informe a mensagem para o ChatGPT: ”
 
 
-Exibe uma mensagem no terminal pedindo ao usuário que insira um texto para ser enviado ao Chat GPT.
+	Exibe uma mensagem no terminal pedindo ao usuário que insira um texto para ser enviado ao Chat GPT.
 
 
-read mensagem
+	read mensagem
 
 
-Solicita ao usuário que insira uma mensagem no terminal. Uma vez que o usuário fornece a mensagem e pressiona Enter, o valor digitado é armazenado na variável mensagem, permitindo que seja utilizado posteriormente no script.
+	Solicita ao usuário que insira uma mensagem no terminal. Uma vez que o usuário fornece a mensagem e pressiona Enter, o valor digitado é armazenado na variável mensagem, permitindo que seja utilizado posteriormente no script.
 
 
-mensagem_url=$(echo “$mensagem” | sed ‘s/  /+/g’)
+	mensagem_url=$(echo “$mensagem” | sed ‘s/  /+/g’)
 
 
-Substitui todos os espaços em branco na variável $mensagem por sinais de adição (+). Isso é feito utilizando o comando sed, que é uma ferramenta de processamento de texto em sistemas Unix-like. O resultado é armazenado na variável mensagem_url, que pode ser utilizada posteriormente no script. Essa substituição é comumente utilizada ao construir URLs para evitar problemas de formatação.
+	Substitui todos os espaços em branco na variável $mensagem por sinais de adição (+). Isso é feito utilizando o comando sed, que é uma ferramenta de processamento de texto em sistemas Unix-like. O resultado é armazenado na variável mensagem_url, que pode ser utilizada posteriormente no script. Essa substituição é comumente utilizada ao construir URLs para evitar problemas de formatação.
 
 
-func_comunica_gpt $mensagem_url
+	func_comunica_gpt $mensagem_url
 
 
-Chama a função func_comunica_gpt e passa o conteúdo da variável $mensagem_url como argumento.
+	Chama a função func_comunica_gpt e passa o conteúdo da variável $mensagem_url como argumento.
 
 
-firefox “https://chatgpt.com/?oai-dm=1&q=$1”
+	firefox “https://chatgpt.com/?oai-dm=1&q=$1”
 
 
-Abre o navegador Firefox com a URL apropriada para interagir com o ChatGPT e passa a mensagem como um parâmetro na URL.
+	Abre o navegador Firefox com a URL apropriada para interagir com o ChatGPT e passa a mensagem como um parâmetro na URL.
 
 
 7- Finalizar o Programa:
 
 
         Finaliza a execução do programa e limpa o terminal.
-
-
-
-
-
-
-
-
-
-
-
 
 8- Fontes:
 
