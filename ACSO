@@ -41,7 +41,7 @@ menu() {
     echo -e "#   Aluno: ${CIANO}João Pedro Martinez${NC}                             #"
     echo -e "#   Aluno: ${CIANO}Phillipe Secondo${NC}                                #"
     echo "#----------------------------------------------------------#"
-    echo -e "$formatacao_data #"
+    echo -e "$formatacao_data 			   #"
     echo -e "# Hora do Sistema: ${AZUL}$(date +%H)${NC} horas e ${AZUL}$(date +%M)${NC} minutos                   #"
     echo "############################################################"
     echo ""
@@ -50,7 +50,8 @@ menu() {
     echo "  2) Gerenciador de senhas"
     echo "  3) Perguntar ao ChatGPT"
     echo "  4) Montar Partição"
-    echo "  5) Finalizar Programa"
+    echo "  5) Relatorio"
+    echo "  6) Finalizar Programa"
     echo ""
     echo "Selecione uma opção:"
 }
@@ -97,8 +98,6 @@ let mem_disponivel=0
 let mem_em_uso=0
 mem_em_uso_pct=0
 
-declare -a discos=()
-
 gerenciador_de_recursos() {
 	trap '' SIGINT
 	stty -echo -icanon time 0 min 0
@@ -132,9 +131,21 @@ interface_de_recursos() {
 }
 
 print_recursos_memoria() {
+
+	n_barras_verm=$(echo "scale=2; ($mem_em_uso_pct / 100) * 20" | bc | awk '{print int($1)}')
+	n_barras_verd=$((20 - n_barras_verm))
+	
+	barras_verdes=$(printf "%${n_barras_verd}s" | tr ' ' '|')
+	barras_verdes=$(echo -e "${VERDE}${barras_verdes}${NC}")
+
+	barras_verm=$(printf "%${n_barras_verm}s" | tr ' ' '|')
+        barras_verm=$(echo -e "${VERMELHO}${barras_verm}${NC}")
+
+	barra_mem=$(echo "[$barras_verm$barras_verdes]")
+
 	echo "Mem Total      : $mem_total GB"
         echo "Mem Livre      : $mem_livre GB"
-        echo "Mem Disponivel : $mem_disponivel GB"
+        echo -e "Mem Disponivel : $mem_disponivel GB		$barra_mem${NEGRITO}$mem_em_uso GB/$mem_total GB${NC}"
         echo "Mem em uso     : $mem_em_uso GB"
         echo "Mem em uso     : $mem_em_uso_pct %"
 }
@@ -190,12 +201,16 @@ recurso_memoria() {
 	mem_em_uso_pct=$(echo "scale=2; $mem_em_uso / $mem_total * 100" | bc)
 
 	mem_total=$(echo "scale=1; $mem_total / 1000000" | bc)
-	
+	mem_total=$(echo "$mem_total" | sed 's/^\./0./')
+
 	mem_livre=$(echo "scale=1; $mem_livre / 1000000" | bc)
+	mem_livre=$(echo "$mem_livre" | sed 's/^\./0./')
 
 	mem_disponivel=$(echo "scale=1; $mem_disponivel / 1000000" | bc)
+	mem_disponivel=$(echo "$mem_disponivel" | sed 's/^\./0./')
 
 	mem_em_uso=$(echo "scale=1; $mem_em_uso / 1000000" | bc)
+	mem_em_uso=$(echo "$mem_em_uso" | sed 's/^\./0./')
 }
 
 recursos_cpu() {
@@ -234,12 +249,14 @@ interface_gerenciador_senhas() {
 	echo "1) Salvar nova senha"
 	echo "2) Excluir senha"
 	echo "3) Listar senhas"
+	echo "*) Insira qualquer tecla para sair"
 
 	read -p "Selecione uma opção: " -r opcao
 	case $opcao in
 		1) salvar_nova_senha;;
 		2) excluir_conta;;
 		3) listar_senhas;;
+		*) return;;
 	esac
 }
 
@@ -263,8 +280,6 @@ printa_senhas() {
 	clear
 
 	descriptografar_arquivo
-	
-	sleep 20
 
 	let n_linha=1
 	while IFS= read linha
@@ -272,8 +287,6 @@ printa_senhas() {
 		echo "$n_linha) ${linha[0]}	${linha[1]}"
 		n_linha=$((n_linha + 1))
 	done < "/home/virtual/AC_SO/senhas.txt"
-
-	sleep 20
 
 	criptografar_arquivo
 }
@@ -299,7 +312,7 @@ salva_arquivo_pass() {
 	else
 		echo "$1 $2 $3" >> senhas.txt
 	fi
-	sleep 20
+
 	criptografar_arquivo
 
 }
@@ -315,7 +328,7 @@ criptografar_arquivo() {
 
 descriptografar_arquivo() {
 	openssl enc -d -aes-256-cbc -in "/home/virtual/AC_SO/senhas.enc" -out "/home/virtual/AC_SO/senhas.txt" -pass pass:"$password" -pbkdf2 -iter 100000
-	#rm "/home/virtual/AC_SO/senhas.enc"
+	rm "/home/virtual/AC_SO/senhas.enc"
 }
 
 # -------------------- Fim Gerenciador de Senhas ----------------------------
@@ -335,9 +348,26 @@ processar_opcao() {
         2) interface_gerenciador_senhas ;;
         3) processa_pesquisa_chatgpt ;;
         4) montar_particao ;;
-        5) finalizar_programa;;
+	5) relatorio;;
+	6) finalizar_programa;;
         *) echo "Opção inválida. Por favor, escolha novamente." ;;
     esac
+}
+
+relatorio() {
+
+	clear
+
+	while IFS= read linha
+        do
+                echo -e "$linha"
+                n_linha=$((n_linha + 1))
+        done < "/home/virtual/AC_SO/relatorio.txt"
+
+	read -p "Digite algo para sair" key
+	if [ $key ]; then
+		return
+	fi
 }
 
 processa_pesquisa_chatgpt() {
